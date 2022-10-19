@@ -15,10 +15,25 @@ def bilinear(img, px, py):
     y1 = int(np.ceil(py))
     x2 = int(np.floor(px))
     y2 = int(np.floor(py))
-    try:
-        matB = np.array([[img[x1][y1], img[x1][y2]], [img[x2][y1], img[x2][y2]]])
-    except:
-        matB = np.array([[0, 0], [0, 0]])
+
+    xy = img.shape
+    
+    if x1 >= xy[0]: 
+        x1 = xy[0] - 1
+        if x2 >= xy[0]:
+            x1 = xy[0] - 2
+            x2 = xy[0] - 1
+    if y1 >= xy[1]: 
+        y1 = xy[1] - 1
+        if y2 >= xy[1]:
+            y1 = xy[1] - 2
+            y2 = xy[1] - 1
+    
+    matB = np.array([[img[x1][y1], img[x1][y2]], [img[x2][y1], img[x2][y2]]])
+    # try:
+    #     matB = np.array([[img[x1][y1], img[x1][y2]], [img[x2][y1], img[x2][y2]]])
+    # except:
+    #     matB = np.array([[0, 0], [0, 0]])
     matC = np.array([[0.5], [0.5]])
 
     ans = np.dot(matA, matB)
@@ -36,15 +51,15 @@ def set_img_lr(img, parameters):
     K = parameters['K']
     
     H, W = img.shape
-    h, w = round(H/S), round(W/S)
+    h, w = int(H/S), int(W/S)
     img_rescaled = correlate_sparse(img, K)
     
     #Set initial image set
     set_img = []
     for k in range(NImages):
         smallImg = np.zeros((h,w))
-        for i in range(h-1):
-            for j in range(w-1):
+        for i in range(h):
+            for j in range(w):
                 px = i*S + dx[k] + 0.5
                 py = j*S + dy[k] + 0.5
                 smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()

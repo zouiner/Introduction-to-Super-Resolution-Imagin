@@ -6,10 +6,10 @@ from tkinter import N
 from Ex2 import set_img_lr
 
 #Parameters
-S = 2
-NImages = 4
-dx = [0, 0, 1, 1]
-dy = [0, 1, 0, 1]
+S = 3
+NImages = 7
+dx = [0, 2, 1, 1, 2, 0, 2] 
+dy = [0, 0, 1, 2, 1, 2, 2]
 NoiseStd = 0
 K = [[1]]
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
@@ -34,13 +34,12 @@ set_img = set_img_lr(img, parameters)
 
 h, w = set_img[0].shape
 
-SR_img = np.ones((H, W)) * 0.5
-
+SR_img = np.zeros((H, W))
 
 for k in range(NImages):
     LR_img = set_img[k]
-    for i in range(h):
-        for j in range(w):
+    for i in range(h-1):
+        for j in range(w-1):
             px = i*S + dx[k]
             py = j*S + dy[k]
             SR_img[px][py] = LR_img[i][j]
