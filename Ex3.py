@@ -10,6 +10,7 @@ S = 2
 NImages = 4
 dx = [0, 0, 1, 1]
 dy = [0, 1, 0, 1]
+
 NoiseStd = 0
 K = [[1]]
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
@@ -34,7 +35,7 @@ set_img = set_img_lr(img, parameters)
 
 h, w = set_img[0].shape
 
-SR_img = np.ones((H, W)) * 0.5
+SR_img = np.zeros((H, W))
 
 
 for k in range(NImages):

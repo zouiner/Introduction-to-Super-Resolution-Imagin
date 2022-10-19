@@ -5,11 +5,50 @@ exec(open('packages.py').read())
 from tkinter import N
 from Ex2 import set_img_lr
 
+#random coordinate to simulate a motion 
+def random_coor(n):
+    x = []
+    y = []
+    h = int(np.sqrt(n))
+    i = 0
+    count = 0
+    while(i<n):
+        temp_x = int(np.random.rand()*100 % (h+ int(count/100)))
+        temp_y = int(np.random.rand()*100 % (h+ int(count/100)))
+        x.append(temp_x)
+        y.append(temp_y)
+        for j in range(len(x) - 1):
+            if temp_x == x[j] and temp_y == y[j]:
+                x.pop()
+                y.pop()
+                i -= 1
+                count += 1
+                break
+        i += 1
+    return x, y
+
+
 #Parameters
 S = 3
-NImages = 7
-dx = [0, 2, 1, 1, 2, 0, 2] 
-dy = [0, 0, 1, 2, 1, 2, 2]
+NImages = 9
+dx, dy = random_coor(NImages)
+print(dx, dy)
+# NImages = 4
+# dx = [0, 0, 1, 1]
+# dy = [0, 1, 0, 1]
+
+# NImages = 5
+# dx = [0, 2, 1, 1, 2] 
+# dy = [0, 0, 1, 2, 1]
+
+# NImages = 7
+# dx = [0, 2, 1, 1, 2, 0, 2] 
+# dy = [0, 0, 1, 2, 1, 2, 2]
+
+# NImages = 9
+# dx = [0, 2, 1, 1, 2, 0, 2, 0, 0] 
+# dy = [0, 0, 1, 2, 1, 2, 2, 1, 2]
+
 NoiseStd = 0
 K = [[1]]
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
@@ -34,16 +73,20 @@ set_img = set_img_lr(img, parameters)
 
 h, w = set_img[0].shape
 
-SR_img = np.zeros((H, W))
+Fusion_img = np.zeros((H, W))
+Flag_img = np.ones((H, W))
 
 for k in range(NImages):
     LR_img = set_img[k]
-    for i in range(h-1):
-        for j in range(w-1):
+    for i in range(h):
+        for j in range(w):
             px = i*S + dx[k]
             py = j*S + dy[k]
-            SR_img[px][py] = LR_img[i][j]
+            Fusion_img[px][py] = LR_img[i][j]
+            Flag_img[px][py] = 0
 
+
+SR_img = inpaint.inpaint_biharmonic(Fusion_img, Flag_img)
 
 _, ax = plt.subplots(ncols=3)
 
