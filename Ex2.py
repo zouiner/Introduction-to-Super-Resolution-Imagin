@@ -50,6 +50,13 @@ def set_img_lr(img, parameters):
                 smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()
         set_img.append(smallImg)
     return set_img
+    # for k in range(NImages):
+    #     smallImg =  resize_local_mean(img_rescaled, (h,w))
+    #     for i in range(h):
+    #         for j in range(w):
+    #             smallImg[i][j] = smallImg[i][j] + NoiseStd * np.random.rand()
+    #     set_img.append(smallImg)
+    # return set_img
 
 set_img = set_img_lr(img, parameters)
 
@@ -62,7 +69,7 @@ set_img = set_img_lr(img, parameters)
 # ax[0].axis('off')
 # ax[0].set_title('Original')
 
-# ax[1].imshow(img_rescaled, cmap = 'gray')
+# ax[1].imshow(set_img[0], cmap = 'gray')
 # ax[1].axis('off')
 # ax[1].set_title("Blurred")
 

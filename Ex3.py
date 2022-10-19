@@ -12,6 +12,7 @@ dx = [0, 0, 1, 1]
 dy = [0, 1, 0, 1]
 NoiseStd = 0
 K = [[1]]
+#[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
 
 parameters = {}
 parameters['S'] = S
@@ -44,7 +45,7 @@ for k in range(NImages):
             SR_img[px][py] = LR_img[i][j]
 
 
-_, ax = plt.subplots(ncols=6)
+_, ax = plt.subplots(ncols=3)
 
 ax[0].imshow(img, cmap = 'gray')
 ax[0].axis('off')
@@ -54,7 +55,7 @@ ax[1].imshow(SR_img, cmap = 'gray')
 ax[1].axis('off')
 ax[1].set_title("SR")
 
-for k in range(NImages):
+for k in range(1):
     ax[k+2].imshow(set_img[k], cmap = 'gray')
     ax[k+2].axis('off')
     ax[k+2].set_title("Blurred" + str(k+1))
