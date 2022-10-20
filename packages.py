@@ -7,6 +7,8 @@ from skimage.filters import correlate_sparse
 from skimage.restoration import inpaint, unsupervised_wiener #ex4, ex5
 from matplotlib import pyplot as plt
 
+from scipy.signal import convolve2d as conv2 #Ex2
+
 ################################################################
 # Functions
 ################################################################
@@ -56,7 +58,7 @@ def set_img_lr(img, parameters):
     
     H, W = img.shape
     h, w = int(H/S), int(W/S)
-    img_rescaled = correlate_sparse(img, K)
+    img_rescaled = conv2(img, K)
     
     #Set initial image set
     set_img = []
