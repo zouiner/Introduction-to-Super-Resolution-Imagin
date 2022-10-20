@@ -25,10 +25,12 @@ parameters['K'] = K
 img = io.imread('Dataset/image.jpg', as_gray=True)
 img = rescale(img, 0.25, anti_aliasing=False)
 
-H, W = img.shape
+
 
 # Create a Set of LR images
-set_img = set_img_lr(img, parameters)
+set_img, img = set_img_lr(img, parameters)
+
+H, W = img.shape
 
 h, w = set_img[0].shape
 
@@ -57,6 +59,6 @@ ax[1].set_title("SR")
 for k in range(1):
     ax[k+2].imshow(set_img[k], cmap = 'gray')
     ax[k+2].axis('off')
-    ax[k+2].set_title("Blurred" + str(k+1))
+    ax[k+2].set_title("LR " + str(k+1))
 
 plt.show()

@@ -1,8 +1,7 @@
 #packages
-from tkinter import N
 import numpy as np
 from skimage import io
-from skimage.transform import rescale, resize_local_mean
+from skimage.transform import rescale, resize, resize_local_mean
 from skimage.filters import correlate_sparse
 from skimage.restoration import inpaint, unsupervised_wiener #ex4, ex5
 from matplotlib import pyplot as plt
@@ -57,6 +56,9 @@ def set_img_lr(img, parameters):
     K = parameters['K']
     
     H, W = img.shape
+    H = int(H - H%S)
+    W = int(W - W%S)
+    img = resize(img, (H, W))
     h, w = int(H/S), int(W/S)
     img_rescaled = conv2(img, K)
     
@@ -70,7 +72,7 @@ def set_img_lr(img, parameters):
                 py = j*S + dy[k] + 0.5
                 smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()
         set_img.append(smallImg)
-    return set_img
+    return set_img, img
     # for k in range(NImages):
     #     smallImg =  resize_local_mean(img_rescaled, (h,w))
     #     for i in range(h):

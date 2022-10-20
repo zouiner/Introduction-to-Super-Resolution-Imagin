@@ -10,10 +10,11 @@ img = io.imread('Dataset/image.jpg', as_gray=True)
 img = rescale(img, 0.25, anti_aliasing=False)
 
 
-set_img = set_img_lr(img, parameters)
 
-# io.imshow_collection(set_img, cmap= 'gray')
-# plt.show()
+set_img, img = set_img_lr(img, parameters)
+
+io.imshow_collection(set_img, cmap= 'gray')
+plt.show()
 # ----------------------------------------------------------------
 # _, ax = plt.subplots(ncols=2)
 

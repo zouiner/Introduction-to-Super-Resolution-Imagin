@@ -5,10 +5,12 @@ exec(open('packages.py').read())
 #Parameters
 S = 3
 NImages = 9
-dx, dy = random_coor(NImages)
-print(dx, dy)
+# dx, dy = random_coor(NImages)
+# print(dx, dy)
+dx = [0, 0, 0, 1, 1, 1, 2, 2, 2] 
+dy = [0, 1, 2, 0, 1, 2, 0, 1, 2]
 
-NoiseStd = 2/255
+NoiseStd = 0/255
 size_K = 5
 K = gaussuian_filter(size_K)
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
@@ -26,11 +28,11 @@ parameters['K'] = K
 img = io.imread('Dataset/image.jpg', as_gray=True)
 img = rescale(img, 0.25, anti_aliasing=False)
 
-H, W = img.shape
 
 # Create a Set of LR images
-set_img = set_img_lr(img, parameters)
+set_img, img = set_img_lr(img, parameters)
 
+H, W = img.shape
 h, w = set_img[0].shape
 
 Fusion_img = np.zeros((H, W))
@@ -46,19 +48,23 @@ for k in range(NImages):
 
 SR_img, _ = unsupervised_wiener(Fusion_img, K)
 
-_, ax = plt.subplots(ncols=3)
+_, ax = plt.subplots(nrows = 2, ncols=3)
 
-ax[0].imshow(img, cmap = 'gray')
-ax[0].axis('off')
-ax[0].set_title('Original')
+ax[0][0].imshow(img, cmap = 'gray')
+ax[0][0].axis('off')
+ax[0][0].set_title('Original')
 
-ax[1].imshow(SR_img, cmap = 'gray')
-ax[1].axis('off')
-ax[1].set_title("SR")
+ax[0][1].imshow(SR_img, cmap = 'gray')
+ax[0][1].axis('off')
+ax[0][1].set_title("SR")
 
-for k in range(1):
-    ax[k+2].imshow(set_img[k], cmap = 'gray')
-    ax[k+2].axis('off')
-    ax[k+2].set_title("Blurred" + str(k+1))
+ax[0][2].imshow(Fusion_img, cmap = 'gray')
+ax[0][2].axis('off')
+ax[0][2].set_title("Fusion")
+
+for k in range(3):
+    ax[1][k].imshow(set_img[k], cmap = 'gray')
+    ax[1][k].axis('off')
+    ax[1][k].set_title("LR " + str(k+1))
 
 plt.show()
