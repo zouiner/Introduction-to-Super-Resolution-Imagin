@@ -7,24 +7,10 @@ S = 3
 NImages = 9
 dx, dy = random_coor(NImages)
 print(dx, dy)
-# NImages = 4
-# dx = [0, 0, 1, 1]
-# dy = [0, 1, 0, 1]
 
-# NImages = 5
-# dx = [0, 2, 1, 1, 2] 
-# dy = [0, 0, 1, 2, 1]
-
-# NImages = 7
-# dx = [0, 2, 1, 1, 2, 0, 2] 
-# dy = [0, 0, 1, 2, 1, 2, 2]
-
-# NImages = 9
-# dx = [0, 2, 1, 1, 2, 0, 2, 0, 0] 
-# dy = [0, 0, 1, 2, 1, 2, 2, 1, 2]
-
-NoiseStd = 0
-K = [[1]]
+NoiseStd = 2/255
+size_K = 5
+K = gaussuian_filter(size_K)
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
 
 parameters = {}
@@ -48,7 +34,6 @@ set_img = set_img_lr(img, parameters)
 h, w = set_img[0].shape
 
 Fusion_img = np.zeros((H, W))
-Flag_img = np.ones((H, W))
 
 for k in range(NImages):
     LR_img = set_img[k]
@@ -57,10 +42,9 @@ for k in range(NImages):
             px = i*S + dx[k]
             py = j*S + dy[k]
             Fusion_img[px][py] = LR_img[i][j]
-            Flag_img[px][py] = 0
 
 
-SR_img = inpaint.inpaint_biharmonic(Fusion_img, Flag_img)
+SR_img, _ = unsupervised_wiener(Fusion_img, K)
 
 _, ax = plt.subplots(ncols=3)
 

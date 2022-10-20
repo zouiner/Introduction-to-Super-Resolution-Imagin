@@ -1,3 +1,5 @@
+exec(open('packages.py').read())
+
 # Set parameters for the degraded HR
 #----------------------------------------------------------------
 

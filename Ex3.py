@@ -1,9 +1,6 @@
 #packages
 exec(open('packages.py').read())
 
-#function
-from tkinter import N
-from Ex2 import set_img_lr
 
 #Parameters
 S = 2
