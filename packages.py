@@ -3,7 +3,7 @@ import numpy as np
 from skimage import io
 from skimage.transform import rescale, resize, resize_local_mean
 from skimage.filters import correlate_sparse
-from skimage.restoration import inpaint, unsupervised_wiener #ex4, ex5
+from skimage.restoration import inpaint, richardson_lucy #ex4, ex5
 from matplotlib import pyplot as plt
 
 from scipy.signal import convolve2d as conv2 #Ex2
@@ -60,7 +60,7 @@ def set_img_lr(img, parameters):
     W = int(W - W%S)
     img = resize(img, (H, W))
     h, w = int(H/S), int(W/S)
-    img_rescaled = conv2(img, K)
+    img_rescaled = conv2(img, K, mode='valid')
     
     #Set initial image set
     set_img = []
@@ -107,20 +107,12 @@ def random_coor(n):
 
 #Ex5
 # Function Gaussuian Matrix
-def gaussuian_filter(kernel_size, sigma=1, muu=0):
-
-  # Initializing value of x,y as grid of kernel size
-  # in the range of kernel size
-
-  x, y = np.meshgrid(np.linspace(-1, 1, kernel_size),
-          np.linspace(-1, 1, kernel_size))
-  dst = np.sqrt(x**2+y**2)
-
-  # lower normal part of gaussian
-  normal = 1/(2.0 * np.pi * sigma**2)
-
-  # Calculating Gaussian filter
-  gauss = np.exp(-((dst-muu)**2 / (2.0 * sigma**2))) * normal
-  
-  return gauss
+def gkern(sig, l=3):
+    """\
+    creates gaussian kernel with side length `l` and a sigma of `sig`
+    """
+    ax = np.linspace(-(l - 1) / 2., (l - 1) / 2., l)
+    gauss = np.exp(-0.5 * np.square(ax) / np.square(sig))
+    kernel = np.outer(gauss, gauss)
+    return kernel / np.sum(kernel)
 
