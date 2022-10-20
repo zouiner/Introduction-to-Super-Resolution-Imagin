@@ -5,14 +5,12 @@ exec(open('packages.py').read())
 #Parameters
 S = 3
 NImages = 9
-# dx, dy = random_coor(NImages)
-# print(dx, dy)
-dx = [0, 0, 0, 1, 1, 1, 2, 2, 2] 
-dy = [0, 1, 2, 0, 1, 2, 0, 1, 2]
+dx, dy = random_coor(NImages)
+print(dx, dy)
 
-NoiseStd = 0/255
+NoiseStd = 2/255
 size_K = 5
-K = gaussuian_filter(size_K)
+K = gkern(2.5)
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
 
 parameters = {}
@@ -46,7 +44,7 @@ for k in range(NImages):
             Fusion_img[px][py] = LR_img[i][j]
 
 
-SR_img, _ = unsupervised_wiener(Fusion_img, K)
+SR_img = richardson_lucy(Fusion_img, K, num_iter=50)
 
 _, ax = plt.subplots(nrows = 2, ncols=3)
 
