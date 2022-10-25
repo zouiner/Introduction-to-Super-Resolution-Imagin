@@ -3,8 +3,8 @@ exec(open('packages.py').read())
 
 
 #Parameters
-S = 3
-NImages = 9
+S = 4
+NImages = 16
 dx, dy = random_coor(NImages)
 print(dx, dy)
 
@@ -44,7 +44,8 @@ for k in range(NImages):
             Fusion_img[px][py] = LR_img[i][j]
 
 
-SR_img = richardson_lucy(Fusion_img, K, num_iter=50)
+# SR_img = richardson_lucy(Fusion_img, K, num_iter=50)
+SR_img = deconv2DTV(Fusion_img, K)
 
 _, ax = plt.subplots(nrows = 2, ncols=3)
 

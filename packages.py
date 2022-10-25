@@ -3,7 +3,7 @@ import numpy as np
 from skimage import io
 from skimage.transform import rescale, resize, resize_local_mean
 from skimage.filters import correlate_sparse
-from skimage.restoration import inpaint, richardson_lucy #ex4, ex5
+from skimage.restoration import inpaint, richardson_lucy, denoise_tv_chambolle #ex4, ex5
 from matplotlib import pyplot as plt
 
 from scipy.signal import convolve2d as conv2 #Ex2
@@ -107,6 +107,18 @@ def random_coor(n):
 
 #Ex5
 # Function Gaussuian Matrix
+
+def deconv2DTV(img, kern, lamb = 0.06, iterations = 600, epsilon = 0.4*1e-2):
+    f = np.copy(img)
+    tau = 1.9 / ( 1 + lamb * 8 / epsilon)
+    for i in range(iterations):
+        e = conv2(f, kern, mode='same') - img
+        Gr = np.gradient(f)
+        div = sum(Gr/np.linalg.norm(Gr))
+        f -= tau*(conv2(e, kern, mode='same') + lamb*(div))
+    return f
+
+
 def gkern(sig, l=3):
     """\
     creates gaussian kernel with side length `l` and a sigma of `sig`
