@@ -57,7 +57,7 @@ def set_img_LR_CFA(img, parameters):
             for j in range(w):
                 px = i*S + dx[k] + 0.5
                 py = j*S + dy[k] + 0.5
-                smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()
+                smallImg[i][j] = bilinear(img_rescaled[],px,py) + NoiseStd * np.random.rand()
 
     return img_rescaled
 
