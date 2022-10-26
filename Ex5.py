@@ -3,13 +3,12 @@ exec(open('packages.py').read())
 
 
 #Parameters
-S = 4
-NImages = 16
+S = 3
+NImages = 9
 dx, dy = random_coor(NImages)
 print(dx, dy)
 
-NoiseStd = 2/255
-size_K = 5
+NoiseStd = 10/255
 K = gkern(2.5)
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
 

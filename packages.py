@@ -7,6 +7,7 @@ from skimage.restoration import inpaint, richardson_lucy, denoise_tv_chambolle #
 from matplotlib import pyplot as plt
 
 from scipy.signal import convolve2d as conv2 #Ex2
+import cv2
 
 ################################################################
 # Functions
@@ -60,7 +61,7 @@ def set_img_lr(img, parameters):
     W = int(W - W%S)
     img = resize(img, (H, W))
     h, w = int(H/S), int(W/S)
-    img_rescaled = conv2(img, K, mode='valid')
+    img_rescaled = cv2.filter2D(img, -1, K)
     
     #Set initial image set
     set_img = []
@@ -112,10 +113,10 @@ def deconv2DTV(img, kern, lamb = 0.06, iterations = 600, epsilon = 0.4*1e-2):
     f = np.copy(img)
     tau = 1.9 / ( 1 + lamb * 8 / epsilon)
     for i in range(iterations):
-        e = conv2(f, kern, mode='same') - img
+        e = cv2.filter2D(f, -1, kern) - img
         Gr = np.gradient(f)
         div = sum(Gr/np.linalg.norm(Gr))
-        f -= tau*(conv2(e, kern, mode='same') + lamb*(div))
+        f -= tau*(cv2.filter2D(e, -1, kern) + lamb*(div))
     return f
 
 
