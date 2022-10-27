@@ -35,36 +35,17 @@ img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 img = rescale(img, 0.25, multichannel=True)
 
 # Create a Set of LR images
-def set_img_LR_CFA(img, parameters):
-    S = parameters['S']
-    NImages = parameters['NImages']
-    dx = parameters['dx']
-    dy = parameters['dy']
-    NoiseStd = parameters['NoiseStd']
-    K = parameters['K']
-    CFA = parameters['CFA']
-
-    H, W, C = img.shape
-    H = int(H - H%S)
-    W = int(W - W%S)
-    img = resize(img, (H, W, 3))
-    h, w = int(H/S), int(W/S)
-    img_rescaled = cv2.filter2D(img, -1, K)
-
-    for k in range(NImages):
-        small_img = np.zeros((h,w,3))
-        for i in range(h):
-            for j in range(w):
-                px = i*S + dx[k] + 0.5
-                py = j*S + dy[k] + 0.5
-                smallImg[i][j] = bilinear(img_rescaled[],px,py) + NoiseStd * np.random.rand()
-
-    return img_rescaled
-
-img = set_img_LR_CFA(img, parameters)
+set_img, img, img_rescaled = set_img_LR_CFA(img, parameters)
 
 
+# _, ax = plt.subplots(ncols=2)
 
+# ax[0].imshow(img)
+# ax[0].axis('off')
+# ax[0].set_title('Original')
 
-# io.imshow(img)
+# ax[1].imshow(set_img[0])
+# ax[1].axis('off')
+# ax[1].set_title("LR")
+
 # plt.show()

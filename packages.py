@@ -107,7 +107,7 @@ def random_coor(n):
 
 
 #Ex5
-# Function Gaussuian Matrix
+
 
 def deconv2DTV(img, kern, lamb = 0.06, iterations = 600, epsilon = 0.4*1e-2):
     f = np.copy(img)
@@ -119,7 +119,7 @@ def deconv2DTV(img, kern, lamb = 0.06, iterations = 600, epsilon = 0.4*1e-2):
         f -= tau*(cv2.filter2D(e, -1, kern) + lamb*(div))
     return f
 
-
+# Function Gaussuian Matrix
 def gkern(sig, l=3):
     """\
     creates gaussian kernel with side length `l` and a sigma of `sig`
@@ -129,3 +129,32 @@ def gkern(sig, l=3):
     kernel = np.outer(gauss, gauss)
     return kernel / np.sum(kernel)
 
+#Ex6 
+# Function for downstamping with color images
+def set_img_LR_CFA(img, parameters):
+    S = parameters['S']
+    NImages = parameters['NImages']
+    dx = parameters['dx']
+    dy = parameters['dy']
+    NoiseStd = parameters['NoiseStd']
+    K = parameters['K']
+    CFA = parameters['CFA']
+
+    H, W, C = img.shape
+    H = int(H - H%S)
+    W = int(W - W%S)
+    img = resize(img, (H, W, 3))
+    h, w = int(H/S), int(W/S)
+    img_rescaled = cv2.filter2D(img, -1, K)
+
+    set_img = []
+    for k in range(NImages):
+        smallImg = np.zeros((h,w,3))
+        for i in range(h):
+            for j in range(w):
+                px = i*S + dx[k] + 0.5
+                py = j*S + dy[k] + 0.5
+                CFA_c = CFA[i%2][j%2] - 1 
+                smallImg[i][j][CFA_c] = bilinear(img_rescaled[:,:,CFA_c],px,py) + NoiseStd * np.random.rand()
+        set_img.append(smallImg)
+    return set_img, img, img_rescaled
