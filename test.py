@@ -10,13 +10,6 @@ import torch.nn as nn
 plt.rcParams["savefig.bbox"] = 'tight'
 torch.manual_seed(1)
 
-def show(imgs):
-    fix, axs = plt.subplots(ncols=len(imgs), squeeze=False)
-    for i, img in enumerate(imgs):
-        img = T.ToPILImage()(img.to('cpu'))
-        axs[0, i].imshow(np.asarray(img))
-        axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
-
 
 def bilinear(img, px, py):
 
@@ -53,32 +46,23 @@ def set_img_lr(img, parameters):
     img = T.Resize(size=(H, W))(img)
     h, w = int(H/S), int(W/S)
 
-    # padding = max(max(dx,dy)) * 2
-    # img = T.Pad(padding=padding)(img)
+    padding = max(max(dx,dy)) * 2
+    img = T.Pad(padding=padding)(img)
     img_rescaled = K(img)[0]
 
-
     #Set initial image set
-    # set_img = []
-    # for k in range(NImages):
-    #     smallImg = np.zeros((h,w))
-    #     for i in range(h):
-    #         for j in range(w):
-    #             px = i*S + dx[k] + 0.5
-    #             py = j*S + dy[k] + 0.5
-    #             smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()
-    #     set_img.append(smallImg)
-
     set_img = []
-    smallImg = torch.zeros([h, w], dtype=torch.uint8)
-    for i in range(h):
-        for j in range(w):
-            px = i*S + dx[0]
-            py = j*S + dy[0]
-            smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()
-            # smallImg[i][j] = img_rescaled[px][py]+ NoiseStd * np.random.rand()
-    set_img = torch.Tensor(smallImg)
-    return set_img, img, img_rescaled, smallImg
+    for k in range(NImages):
+        smallImg = np.zeros((h,w))
+        for i in range(h):
+            for j in range(w):
+                px = i*S + dx[k] + 0.5 + 1
+                py = j*S + dy[k] + 0.5 + 1
+                
+                smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()
+        set_img.append(torch.Tensor(smallImg).to(torch.uint8))
+
+    return set_img, img, img_rescaled
 
 
 
@@ -94,7 +78,7 @@ NoiseStd = 0/255
 # K = np.array(K)
 # K = torch.Tensor(K)
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
-K = torchvision.transforms.GaussianBlur(3, sigma=(0.1, 2.5))
+K = torchvision.transforms.GaussianBlur(1, sigma=(1))
 
 parameters = {}
 parameters['S'] = S
@@ -110,20 +94,31 @@ parameters['K'] = K
 img = torchvision.io.read_image('Dataset/image.jpg')
 img = T.Resize(size=300)(img)
 img = T.Grayscale()(img)
-img = img.unsqueeze(0)
-_, _, H, W = img.shape
-img = F.interpolate(img.float(), [int(H/S), int(W/S)], mode='bilinear')
-img.to(torch.uint8)
-img = img.squeeze(0)
-# set_img, img, img_rescaled = set_img_lr(img, parameters)
+# img = img.unsqueeze(0)
+# _, _, H, W = img.shape
+# img = F.interpolate(img.float(), [int(H/S), int(W/S)], mode='bilinear')
+# img = img.to(torch.uint8)
+# img = img.squeeze(0)
+set_img, img, img_rescaled = set_img_lr(img, parameters)
 # print(set_img.shape, img.shape, img_rescaled.shape)
 
 
 
-img = T.ToPILImage()(img.to('cpu'))
+img = T.ToPILImage()(set_img[0].to('cpu'))
 plt.imshow(np.asarray(img), cmap = 'gray')
 plt.show()
 
-# set_img = [i for i in set_img]
-# io.imshow_collection(set_img, cmap= 'gray')
-# plt.show()
+# _, ax = plt.subplots(ncols= NImages+1)
+
+# img = T.ToPILImage()(img.to('cpu'))
+# ax[0].imshow(np.asarray(img), cmap = 'gray')
+# ax[0].axis('off')
+# ax[0].set_title('Original')
+
+# for k in range(NImages):
+#     img = T.ToPILImage()(set_img[k].to('cpu'))
+#     ax[k+1].imshow(np.asarray(img), cmap = 'gray')
+#     ax[k+1].axis('off')
+#     ax[k+1].set_title('LR ' + str(k+1))
+
+plt.show()
