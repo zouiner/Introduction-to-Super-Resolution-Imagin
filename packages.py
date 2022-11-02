@@ -75,6 +75,7 @@ def set_img_lr(img, parameters):
                 smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()
         set_img.append(smallImg)
     return set_img, img
+    
     # for k in range(NImages):
     #     smallImg =  resize_local_mean(img_rescaled, (h,w))
     #     for i in range(h):

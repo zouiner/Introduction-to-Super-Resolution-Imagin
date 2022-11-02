@@ -124,8 +124,6 @@ img = T.ToPILImage()(img.to('cpu'))
 plt.imshow(np.asarray(img), cmap = 'gray')
 plt.show()
 
-
-
 # set_img = [i for i in set_img]
 # io.imshow_collection(set_img, cmap= 'gray')
 # plt.show()
