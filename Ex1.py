@@ -4,19 +4,21 @@ exec(open('packages.py').read())
 #----------------------------------------------------------------
 
 # Define the SR magnification
-S = 3
-
-# Define thenumber of LR images, and their offsets
+S = 2
 NImages = 4
-dx = np.array([0, 0, 2, 1])
-dy = np.array([0, 1, 0, 2])
+dx, dy = random_coor(NImages)
+print(dx, dy)
 
-#Define the Std deviation of the noise
-NoiseStd = 5/255
+NoiseStd = 0/255
+K = gkern(2.5)
+# K = [[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
+K = [[1]]
+K = np.array(K)
+K = torch.Tensor(K)
+K = K.unsqueeze(0).unsqueeze(0)
+K = torch.nn.Parameter( K )
+# K = torchvision.transforms.GaussianBlur(1, sigma=(1))
 
-#Define the blur kernel
-# K = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]])/16
-K = np.array([[1]])
 parameters = {}
 parameters['S'] = S
 parameters['NImages'] = NImages

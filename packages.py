@@ -10,6 +10,11 @@ from scipy.signal import convolve2d as conv2 #Ex2
 import cv2
 import math
 
+import torch, torchvision
+import torchvision.transforms as T
+import torch.nn.functional as F
+import torch.nn as nn
+
 ################################################################
 # Functions
 ################################################################
@@ -51,9 +56,12 @@ def set_img_lr(img, parameters):
     img = T.Resize(size=(H, W))(img)
     h, w = int(H/S), int(W/S)
 
+    
+    m = nn.Conv2d(1 , 1, K.shape[3], 1, 1, bias=False)
+    m.weight = K
+    img_rescaled = m(img/255)
     padding = max(max(dx,dy)) * 2
-    img = T.Pad(padding=padding)(img)
-    img_rescaled = K(img)[0]
+    img_rescaled = T.Pad(padding=padding)(img_rescaled)
 
     #Set initial image set
     set_img = []
@@ -63,9 +71,8 @@ def set_img_lr(img, parameters):
             for j in range(w):
                 px = i*S + dx[k] + 0.5 + 1
                 py = j*S + dy[k] + 0.5 + 1
-                
-                smallImg[i][j] = bilinear(img_rescaled,px,py) + NoiseStd * np.random.rand()
-        set_img.append(torch.Tensor(smallImg).to(torch.uint8))
+                smallImg[i][j] = bilinear(img_rescaled[0].detach().numpy(),px,py) + NoiseStd * np.random.rand()
+        set_img.append(torch.Tensor(smallImg)) #.to(torch.uint8))
 
     return set_img, img, img_rescaled
 
