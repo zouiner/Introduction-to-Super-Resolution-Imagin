@@ -3,13 +3,14 @@ exec(open('packages.py').read())
 
 
 #Parameters
-S = 3
+S = 2
 NImages = 9
 dx, dy = random_coor(NImages)
 print(dx, dy)
 
-NoiseStd = 10/255
+NoiseStd = 2/255
 K = gkern(2.5)
+K = np.array(K)
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
 
 parameters = {}

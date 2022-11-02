@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 
 from scipy.signal import convolve2d as conv2 #Ex2
 import cv2
+import math
 
 ################################################################
 # Functions
@@ -154,7 +155,18 @@ def set_img_LR_CFA(img, parameters):
             for j in range(w):
                 px = i*S + dx[k] + 0.5
                 py = j*S + dy[k] + 0.5
-                CFA_c = CFA[i%2][j%2] - 1 
+                CFA_c = CFA[i%2][j%2]
                 smallImg[i][j][CFA_c] = bilinear(img_rescaled[:,:,CFA_c],px,py) + NoiseStd * np.random.rand()
         set_img.append(smallImg)
     return set_img, img, img_rescaled
+
+
+# Ex8
+def convert(img, target_type_min, target_type_max, target_type):
+    imin = img.min()
+    imax = img.max()
+
+    a = (target_type_max - target_type_min) / (imax - imin)
+    b = target_type_max - a * imax
+    new_img = (a * img + b).astype(target_type)
+    return new_img

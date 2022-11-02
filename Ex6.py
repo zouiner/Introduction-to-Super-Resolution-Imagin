@@ -17,7 +17,7 @@ K = np.array(K)
 # K = gkern(2.5)
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
 
-CFA = [[2, 1], [3, 2]]
+CFA = [[1, 0], [2, 1]]
 
 parameters = {}
 parameters['S'] = S

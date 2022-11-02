@@ -11,6 +11,7 @@ dy = [0, 1, 0, 1]
 NoiseStd = 0
 K = [[1]]
 #[[1, 2, 1], [2, 4, 2], [1, 2, 1]]/16
+K = np.array(K)
 
 parameters = {}
 parameters['S'] = S
