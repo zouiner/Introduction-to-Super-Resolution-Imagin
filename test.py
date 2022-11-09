@@ -11,63 +11,6 @@ plt.rcParams["savefig.bbox"] = 'tight'
 torch.manual_seed(1)
 
 
-def bilinear(img, px, py):
-
-    x1 = int(np.ceil(px))
-    y1 = int(np.ceil(py))
-    x2 = int(np.floor(px))
-    y2 = int(np.floor(py))
-
-    matA = np.array([[x2 - px, px - x1]])
-    matB = np.array([[img[x1][y1], img[x1][y2]], [img[x2][y1], img[x2][y2]]])
-    # try:
-    #     matB = np.array([[img[x1][y1], img[x1][y2]], [img[x2][y1], img[x2][y2]]])
-    # except:
-    #     matB = np.array([[0, 0], [0, 0]])
-    matC = np.array([[y2 - py], [py - y1]])
-
-    ans = np.dot(matA, matB)
-    ans = np.dot(ans, matC)
-
-    return ans
-
-def set_img_lr(img, parameters):
-    
-    S = parameters['S']
-    NImages = parameters['NImages']
-    dx = parameters['dx']
-    dy = parameters['dy']
-    NoiseStd = parameters['NoiseStd']
-    K = parameters['K']
-    
-    _, H, W = img.shape
-    H = int(H - H%S)
-    W = int(W - W%S)
-    img = T.Resize(size=(H, W))(img)
-    h, w = int(H/S), int(W/S)
-
-    
-    m = nn.Conv2d(1 , 1, K.shape[3], 1, 1, bias=False)
-    m.weight = K
-    img_rescaled = m(img/255)
-    padding = max(max(dx,dy)) * 2
-    img_rescaled = T.Pad(padding=padding)(img_rescaled)
-
-    #Set initial image set
-    set_img = []
-    for k in range(NImages):
-        smallImg = np.zeros((h,w))
-        for i in range(h):
-            for j in range(w):
-                px = i*S + dx[k] + 0.5 + 1
-                py = j*S + dy[k] + 0.5 + 1
-                smallImg[i][j] = bilinear(img_rescaled[0].detach().numpy(),px,py) + NoiseStd * np.random.rand()
-        set_img.append(torch.Tensor(smallImg)) #.to(torch.uint8))
-
-    return set_img, img, img_rescaled
-
-
-
 #Parameters
 #----------------------------------------------------------------
 S = 2
@@ -100,24 +43,51 @@ img = torchvision.io.read_image('Dataset/image.jpg')
 img = T.Resize(size=300)(img)
 img = T.Grayscale()(img)
 
-set_img, img, img_rescaled = set_img_lr(img, parameters)
+set_img, img, img_rescaled, padding = set_img_lr(img, parameters)
 
 #----------------------------------------------------------------
 # img = T.ToPILImage()(set_img[0].to('cpu'))
 # plt.imshow(np.asarray(img), cmap = 'gray')
 # plt.show()
 
-_, ax = plt.subplots(ncols= NImages+1)
+# _, ax = plt.subplots(ncols= NImages+1)
 
-img = T.ToPILImage()(img.to('cpu'))
-ax[0].imshow(np.asarray(img), cmap = 'gray')
-ax[0].axis('off')
-ax[0].set_title('Original')
+# img = T.ToPILImage()(img.to('cpu'))
+# ax[0].imshow(np.asarray(img), cmap = 'gray')
+# ax[0].axis('off')
+# ax[0].set_title('Original')
 
-for k in range(NImages):
-    img = T.ToPILImage()(set_img[k].to('cpu'))
-    ax[k+1].imshow(np.asarray(img), cmap = 'gray')
-    ax[k+1].axis('off')
-    ax[k+1].set_title('LR ' + str(k+1))
+# for k in range(NImages):
+#     img = T.ToPILImage()(set_img[k].to('cpu'))
+#     ax[k+1].imshow(np.asarray(img), cmap = 'gray')
+#     ax[k+1].axis('off')
+#     ax[k+1].set_title('LR ' + str(k+1))
 
-plt.show()
+# plt.show()
+
+
+
+
+def bilinterpol(img, a, b):
+
+    x1 = int(np.ceil(a))
+    y1 = int(np.ceil(b))
+    x2 = int(np.floor(a))
+    y2 = int(np.floor(b))
+
+    pts = [[x1, y1, img[x1][y1]], [x1, y2, img[x1][y2]], [x2, y1, img[x2][y1]], [x2, y2, img[x2][y2]]]
+
+    i = sorted(pts)
+    (a1, b1, x11), (_a1, b2, x12), (a2, _b1, x21), (_a2, _b2, x22) = i
+    if a1 != _a1 or a2 != _a2 or b1 != _b1 or b2 != _b2:
+        print('The given points do not form a rectangle')
+    if not a1 <= a <= a2 or not b1 <= b <= b2:
+        print('The (a, b) coordinates are not within the rectangle')
+    Y = (x11 * (a2 - a) * (b2 - b) +
+            x21 * (a - a1) * (b2 - b) +
+            x12 * (a2 - a) * (b - b1) +
+            x22 * (a - a1) * (b - b1)
+           ) / ((a2 - a1) * (b2 - b1) + 0.0)
+    return Y
+
+print(bilinterpol(img[0],0.5,0.5))
